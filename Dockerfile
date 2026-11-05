@@ -11,7 +11,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
     ninja-build \
-    git \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
@@ -22,31 +21,16 @@ COPY cmake/ /src/cmake/
 COPY include/ /src/include/
 COPY src/ /src/src/
 COPY viz/ /src/viz/
+COPY tests/ /src/tests
+COPY benchmarks/ /src/benchmarks/
 
 RUN cmake -S /src -B /build -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
     -DHYPHY3_GIT_COMMIT=docker \
-    -DHYPHY3_BUILD_TESTS=OFF \
-    && cmake --build /build --target \
-        hyphy3 \
-        hyphy3-fel \
-        hyphy3-contrast-fel \
-        hyphy3-meme \
-        hyphy3-busted \
-        hyphy3-absrel \
-        hyphy3-relax \
-        hyphy3-fubar \
-        hyphy3-prime \
-        hyphy3-gard \
-        hyphy3-slac \
-        hyphy3-dfel \
-        hyphy3-mss \
-        hyphy3-ohmic \
-        hyphy3-tree \
-        hyphy3-joint-align \
-        hyphy3-characterize \
-        hyphy3-expcm \
+    && cmake --build /build \
     && strip /build/hyphy3 /build/hyphy3-*
+
+RUN ctest --test-dir /build --output-on-failure
 
 # ==============================================================================
 # Stage 2: Minimal runtime image

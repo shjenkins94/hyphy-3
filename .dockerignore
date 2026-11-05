@@ -7,7 +7,9 @@ cmake-build-*/
 .cache/
 reports/
 slkp/
-benchmarks/
+benchmarks/*
+!benchmarks/data/
+!benchmarks/data/**
 docs/
 paper/
 *.o

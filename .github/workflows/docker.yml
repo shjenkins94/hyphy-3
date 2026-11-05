@@ -1,4 +1,4 @@
-name: Docker
+name: Docker CI
 
 # Builds the container image and smoke-tests it. Runs only when something the
 # image build depends on changes.
@@ -14,6 +14,7 @@ on:
       - src/**
       - include/**
       - viz/**
+      - tests/**
       - .github/workflows/docker.yml
   pull_request:
     paths:
@@ -24,6 +25,7 @@ on:
       - src/**
       - include/**
       - viz/**
+      - tests/**
       - .github/workflows/docker.yml
   workflow_dispatch:
 
@@ -35,9 +37,25 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
-      - name: Build image
-        run: docker build -t hyphy3:ci .
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4.4.1
+      - name: Get Docker Metadata
+        id: meta
+        uses: docker/metadata-action@v6.2.0
+        with:
+          images: hyphy3
+          tags: |
+            type=raw,value=ci
+      - name: Build Docker Image
+        uses: docker/build-push-action@v7.4.0
+        with:
+          context: .
+          push: false
+          load: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
       - name: Smoke test (default command prints help)
         run: docker run --rm hyphy3:ci
       - name: Smoke test (version)
