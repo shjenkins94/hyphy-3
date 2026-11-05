@@ -5,9 +5,7 @@ name: Docker CI
 
 on:
   push:
-    branches: 
-      - main
-      - docker_test
+    branches: [main]
     paths:
       - Dockerfile
       - .dockerignore
